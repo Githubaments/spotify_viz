@@ -9,8 +9,8 @@ import json
 import spotipy.util as util
 
 px.defaults.template = "simple_white"
-client_id = '426b805865364e8ea495bbdb3f5f9b1a'
-client_secret = '32c1f6177a7143bc9cb70774d4712baa'
+client_id = secret_id
+client_secret = secret_client
 scope = 'user-library-read playlist-read-private user-top-read'
 redirect = 'http://localhost:7777/callback'
 
