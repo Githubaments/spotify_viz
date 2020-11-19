@@ -7,6 +7,8 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import json
 import spotipy.util as util
+import os
+
 
 st.set_page_config(page_title='Spotify Viz', page_icon="https://raw.githubusercontent.com/Githubaments/Images/main/favicon.ico")
 
