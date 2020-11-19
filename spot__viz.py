@@ -62,7 +62,7 @@ def cache_on_button_press(label, **cache_kwargs):
     return function_decorator
 
 @st.cache(suppress_st_warning=True, show_spinner=False, allow_output_mutation=True)
-def spotify_50(client_id):
+def spotify_50(client_id,client_secret,scope):
     import spotipy
     from spotipy.oauth2 import SpotifyOAuth
     
@@ -315,7 +315,7 @@ def data_viz(df_all):
     return figs
 
 
-dfs,token,usernamesp = spotify_50(client_id)
+dfs,token,usernamesp = spotify_50(client_id,client_secret,scope)
 images_sidebar(dfs)
 df_all = pd.concat([dfs[0],dfs[1],dfs[2]])
 figs = data_viz(df_all)
