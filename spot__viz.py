@@ -1,16 +1,18 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
+import plotly.express as px 
 import requests
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import json
 import spotipy.util as util
 
+st.set_page_config(page_title='Spotify Viz', page_icon="https://raw.githubusercontent.com/Githubaments/Images/main/favicon.ico")
+
 px.defaults.template = "simple_white"
-client_id = secret_id
-client_secret = secret_client
+client_id = (os.environ.get('secret_id'))
+client_secret = (os.environ.get('secret_client'))
 scope = 'user-library-read playlist-read-private user-top-read'
 redirect = 'http://localhost:7777/callback'
 
