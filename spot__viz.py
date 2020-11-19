@@ -13,8 +13,8 @@ import os
 st.set_page_config(page_title='Spotify Viz', page_icon="https://raw.githubusercontent.com/Githubaments/Images/main/favicon.ico")
 
 px.defaults.template = "simple_white"
-client_id = (os.environ.get('secret_id'))
-client_secret = (os.environ.get('secret_client'))
+client_id = (os.environ.get('client_id'))
+client_secret = (os.environ.get('client_secret'))
 scope = 'playlist-modify-private,playlist-modify-public,playlist-modify-public,user-top-read,user-read-recently-played,user-library-read'
 
 
@@ -315,7 +315,7 @@ def data_viz(df_all):
     return figs
 
 
-dfs,token,usernamesp = spotify_50(client_id,client_secret,scope)
+dfs,token,usernamesp = spotify_50()
 images_sidebar(dfs)
 df_all = pd.concat([dfs[0],dfs[1],dfs[2]])
 figs = data_viz(df_all)
