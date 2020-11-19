@@ -15,8 +15,7 @@ st.set_page_config(page_title='Spotify Viz', page_icon="https://raw.githubuserco
 px.defaults.template = "simple_white"
 client_id = (os.environ.get('secret_id'))
 client_secret = (os.environ.get('secret_client'))
-scope = 'user-library-read playlist-read-private user-top-read'
-redirect = 'http://localhost:0/callback'
+scope = 'playlist-modify-private,playlist-modify-public,playlist-modify-public,user-top-read,user-read-recently-played,user-library-read'
 
 
 def cache_on_button_press(label, **cache_kwargs):
@@ -66,11 +65,8 @@ def cache_on_button_press(label, **cache_kwargs):
 def spotify_50():
     import spotipy
     from spotipy.oauth2 import SpotifyOAuth
-
-    client_id = '426b805865364e8ea495bbdb3f5f9b1a'
-    client_secret = '32c1f6177a7143bc9cb70774d4712baa'
-    scope = 'user-library-read playlist-read-private user-top-read'
-    redirect = 'http://localhost:7777/callback'
+    
+    redirect = 'https://localhost'
 
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id,
                                                    client_secret=client_secret,
@@ -129,11 +125,8 @@ def spotify_50():
 
 def get_token(username):
     import spotipy.util as util
-    client_id = '426b805865364e8ea495bbdb3f5f9b1a'
-    client_secret = '32c1f6177a7143bc9cb70774d4712baa'
     # Get Token
-    redirect_uri = 'http://localhost:7777/callback'
-    scope = 'playlist-modify-private,playlist-modify-public,playlist-modify-public,user-top-read,user-read-recently-played,user-library-read'
+    redirect = 'https://localhost'
 
     token = util.prompt_for_user_token(username=username,
                                        scope=scope,
