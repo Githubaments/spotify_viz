@@ -16,7 +16,7 @@ px.defaults.template = "simple_white"
 client_id = (os.environ.get('secret_id'))
 client_secret = (os.environ.get('secret_client'))
 scope = 'user-library-read playlist-read-private user-top-read'
-redirect = 'http://localhost:7777/callback'
+redirect = 'http://localhost:0/callback'
 
 
 def cache_on_button_press(label, **cache_kwargs):
