@@ -62,7 +62,7 @@ def cache_on_button_press(label, **cache_kwargs):
     return function_decorator
 
 @st.cache(suppress_st_warning=True, show_spinner=False, allow_output_mutation=True)
-def spotify_50(client_id,client_secret,scope):
+def spotify_50():
     import spotipy
     from spotipy.oauth2 import SpotifyOAuth
     
