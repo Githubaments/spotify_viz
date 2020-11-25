@@ -16,6 +16,8 @@ px.defaults.template = "simple_white"
 client_id = (os.environ.get('client_id'))
 client_secret = (os.environ.get('client_secret'))
 scope = 'playlist-modify-private,playlist-modify-public,playlist-modify-public,user-top-read,user-read-recently-played,user-library-read'
+redirect = 'http://localhost:7777/callback'
+
 
 
 def cache_on_button_press(label, **cache_kwargs):
@@ -63,10 +65,6 @@ def cache_on_button_press(label, **cache_kwargs):
 
 @st.cache(suppress_st_warning=True, show_spinner=False, allow_output_mutation=True)
 def spotify_50():
-    import spotipy
-    from spotipy.oauth2 import SpotifyOAuth
-    
-    redirect = 'https://localhost'
 
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id,
                                                    client_secret=client_secret,
@@ -125,14 +123,13 @@ def spotify_50():
 
 def get_token(username):
     import spotipy.util as util
-    # Get Token
-    redirect = 'https://localhost'
+
 
     token = util.prompt_for_user_token(username=username,
                                        scope=scope,
                                        client_id=client_id,
                                        client_secret=client_secret,
-                                       redirect_uri=redirect_uri)
+                                       redirect_uri=redirect)
     return token
 
 
@@ -184,6 +181,31 @@ def get_track_key(key, mode):
 
     return key_name
 
+def check_response(json_response, response_check):
+
+    api_response = {204: "No Content - The request has succeeded but returns no message body.",
+                    400: "Please check input data.",
+                    401: "Please check your credentials.",
+                    403: "Forbidden.",
+                    404: "Not found.",
+                    429: "Too many requests.",
+                    500: "Internal Server Error.",
+                    502: "Bad Gateway.",
+                    503: "Service Unavailable."
+                    }
+
+    if response_check not in (200, 201):
+        try:
+            st.write(api_response[response_check])
+            st.write(json_response['error']['message'])
+            st.stop()
+        except KeyError:
+            st.write(json_response['error']['message'])
+            st.write("https://developer.spotify.com/documentation/web-api/")
+            st.stop()
+
+    return
+
 @st.cache(suppress_st_warning=True, show_spinner=False, allow_output_mutation=True)
 def audio_features(df):
     df2 = pd.DataFrame(sp.audio_features(tracks=df.track_uri))
@@ -201,9 +223,6 @@ def images_sidebar(dfs):
         st.sidebar.image(item)
 
     return
-
-#for item in dfs:
-#    st.write(item)
 
 
 
@@ -240,6 +259,7 @@ def data_viz(df_all):
     df['position'] = 50 - df['position']
 
     fig_artist_all = px.histogram(top_songs_album,
+                 category_orders={'timeline':["short_term", "medium_term", "long_term"]},
                  x='artist',
                  barmode='stack',
                  color='timeline',
@@ -247,6 +267,7 @@ def data_viz(df_all):
                  color_discrete_sequence=px.colors.cyclical.mygbm[11:])
 
     fig_album_all = px.histogram(test[:20],
+                 category_orders={'timeline': ["short_term", "medium_term", "long_term"]},
                  x='album',
                  y='count',
                  barmode='stack',
@@ -258,6 +279,7 @@ def data_viz(df_all):
                  x=df_all.index,
                  y='popularity',
                  color='timeline',
+                 category_orders={'timeline': ["short_term", "medium_term", "long_term"]},
                  hover_data=["track_name", "artist"],
                  height=400,
                  color_discrete_sequence=px.colors.cyclical.mygbm[11:])
@@ -271,6 +293,7 @@ def data_viz(df_all):
                 y ='explicit',
                  color='timeline',
                 barmode = 'group',
+                          category_orders={'timeline': ["short_term", "medium_term", "long_term"]},
                  height=400,
                  color_discrete_sequence=px.colors.cyclical.mygbm[11:])
 
@@ -282,6 +305,7 @@ def data_viz(df_all):
               hover_name='track_name',
               hover_data=['artist'],
               orientation='h',
+                           category_orders={'timeline': ["short_term", "medium_term", "long_term"]},
               box=True,
               points="all",
               color_discrete_sequence=px.colors.cyclical.mygbm[11:])
@@ -294,6 +318,7 @@ def data_viz(df_all):
               hover_name='track_name',
               hover_data=['artist'],
               orientation='h',
+                            category_orders={'timeline': ["short_term", "medium_term", "long_term"]},
               box=True,
               points="all",
               color_discrete_sequence=px.colors.cyclical.mygbm[11:])
@@ -306,6 +331,7 @@ def data_viz(df_all):
               hover_name='track_name',
               hover_data=['artist'],
               orientation='h',
+                            category_orders={'timeline': ["short_term", "medium_term", "long_term"]},
               box=True,
               points="all",
               color_discrete_sequence=px.colors.cyclical.mygbm[11:])
@@ -319,6 +345,38 @@ dfs,token,usernamesp = spotify_50()
 images_sidebar(dfs)
 df_all = pd.concat([dfs[0],dfs[1],dfs[2]])
 figs = data_viz(df_all)
+
+st.header("Top 10")
+time = ['Top 50 Short-Term','Top 50 Medium-Term','Top 50 Long-Term']
+
+
+
+cols0 = st.beta_columns(3)
+cols0[0].subheader('Short')
+cols0[1].subheader('Medium')
+cols0[2].subheader('Long-Term')
+
+for index, id in enumerate(dfs[0]['track_name'][:10]):
+        colsa = st.beta_columns(6)
+        colsa[0].image(dfs[0]['image_small'][index])
+        colsa[1].write(dfs[0]['track_name'][index])
+        colsa[2].image(dfs[1]['image_small'][index])
+        colsa[3].write(dfs[1]['track_name'][index])
+        colsa[4].image(dfs[2]['image_small'][index])
+        colsa[5].write(dfs[2]['track_name'][index])
+
+
+st.header("Top 50")
+for index,item in enumerate(dfs):
+    example_expander = st.beta_expander(time[index])
+    with example_expander:
+        for index, id in enumerate(item['track_name']):
+            colsb = st.beta_columns(6)
+            colsb[0].image(item['image_small'][index])
+            colsb[1].write(item['track_name'][index])
+            colsb[2].write(item['artist'][index])
+            colsb[3].write(item['album'][index])
+            colsb[4].audio(item['preview'][index])
 
 
 for item in figs:
@@ -363,8 +421,8 @@ st.header("Now lets find songs based on your favourites")
 
 
 a = st.multiselect('Artists',artists)
-g = st.multiselect('Genres',list(genres))
 t = st.multiselect('Tracks',tracks)
+g = st.multiselect('Genres',list(genres))
 
 
 check_seeds = len(a) + len(g) + len(t)
@@ -384,32 +442,62 @@ song_att = ['valence',
             'speechiness',
             'acousticness']
 
-for item in song_att:
-    add_slider = st.slider(
+
+dict_rec = {}
+for index,item in enumerate(song_att):
+    dict_rec[item] = st.slider(
         item.capitalize(),
-        0.0, 1.0, ((min(df_all[item])), (max(df_all[item])))
+        0.0, 100.0, ((min(df_all[item]*100)), (max(df_all[item]*100)))
         )
 
-add_slider = st.slider(
+for item in dict_rec:
+    dict_rec[item] = list(dict_rec[item])
+    dict_rec[item][0] = (dict_rec[item][0]) / 100
+    dict_rec[item][1] = (dict_rec[item][1]) / 100
+
+
+
+dict_rec['loudness'] = st.slider(
             'Loudness',
-            0.0, 1.00, ((min(df_all['loudness'])), (max(df_all['loudness'])))
+            0.0, 1.0, ((min(df_all['loudness'])), (max(df_all['loudness'])))
         )
 
-add_slider = st.slider(
+
+
+dict_rec['popularity'] = st.slider(
         'Popularity',
         0, 100, ((min(df_all['popularity'])), (max(df_all['popularity'])))
         )
 
-st.multiselect('Select Major Key?', list(major_keys.values()),default= list(major_keys.values()))
-st.multiselect('Select Minor Key?', list(minor_keys.values()),default= list(minor_keys.values()))
-st.radio('Include explicit tracks?', ('Yes','No'))
+major_keys_sel = st.multiselect('Select Major Key?', list(major_keys.values()),default= list(major_keys.values()))
+minor_keys_sel = st.multiselect('Select Minor Key?', list(minor_keys.values()),default= list(minor_keys.values()))
+#st.radio('Include explicit tracks?', ('Yes','No'))
 
-add_slider = st.slider(
+major_key_list = []
+for item in major_keys_sel:
+    major_key_list.append((list(major_keys.keys())[list(major_keys.values()).index(item)]))
+
+minor_key_list = []
+for item in minor_keys_sel:
+    minor_key_list.append((list(minor_keys.keys())[list(minor_keys.values()).index(item)]))
+
+key_max = max(max(major_key_list), max(minor_key_list))
+key_min = min(min(major_key_list), min(minor_key_list))
+
+min_mode = 0
+max_mode = 1
+if len(minor_keys) == 0:
+    min_mode = 1
+if len(major_keys) == 0:
+    max_mode = 0
+
+
+dict_rec['duration'] = st.slider(
     'Song Length in seconds',
     0, 900, (min_length, max_length)
 )
 
-add_slider = st.slider(
+dict_rec['tempo'] = st.slider(
         'Tempo (BPM)',
         0.0, 250.00, ((min(df_all['tempo'])), (max(df_all['tempo'])))
         )
@@ -430,16 +518,42 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id,
                                                    scope=scope))
 
 
-
-
-
-
-
 #get_playlist =  st.button('Get playlist?')
 #if not get_playlist:
 #    st.stop()
 
-playlist = sp.recommendations(seed_artists=a_api, seed_genres=g, seed_tracks=t_api)
+
+playlist = sp.recommendations(seed_artists=a_api, seed_genres=g, seed_tracks=t_api,
+                              min_valence=dict_rec['valence'][0],
+                              min_danceability=dict_rec['danceability'][0],
+                              min_energy=dict_rec['energy'][0],
+                              min_speechiness=dict_rec['speechiness'][0],
+                              min_acousticness=dict_rec['acousticness'][0],
+                              min_loudness=dict_rec['loudness'][0],
+                              min_popularity=dict_rec['popularity'][0],
+                              min_key=key_min,
+                              min_tempo=dict_rec['tempo'][0],
+                              min_duration_ms=(dict_rec['duration'][0])*100,
+                              min_mode=min_mode,
+
+                              max_valence=dict_rec['valence'][1],
+                              max_danceability=dict_rec['danceability'][1],
+                              max_energy=dict_rec['energy'][1],
+                              max_speechiness=dict_rec['speechiness'][1],
+                              max_acousticness=dict_rec['acousticness'][1],
+                              max_loudness=dict_rec['loudness'][1],
+                              max_popularity=dict_rec['popularity'][1],
+                              max_key=key_max,
+                              max_tempo=dict_rec['tempo'][1],
+                              max_duration_ms=(dict_rec['duration'][1])*1000,
+                              max_mode=max_mode,
+
+                              )
+
+playlist_length = len(playlist['tracks'])
+if playlist_length == 0:
+    st.write("No tracks could be found that fit those values.")
+    st.stop()
 
 playlist_uri = []
 playlist_artist = []
@@ -486,12 +600,6 @@ playlist_10 =  sp.user_playlist_add_tracks(usernamesp, playlist_10['id'], playli
 
 
 
-
-
-
-# duration_ms
-#key
-#mode
 
 
 
