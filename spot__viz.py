@@ -71,6 +71,7 @@ def spotify_50():
                                                    redirect_uri=redirect,
                                                    scope=scope))
     st.write(sp)
+    st.write(sp.me())
     json_response = sp.me()
 
     display_name = json_response['display_name']
