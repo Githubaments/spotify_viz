@@ -4,3 +4,4 @@ plotly_express==0.4.1
 pandas==1.0.4 
 numpy==1.18.3
 spotipy
+tekore 
