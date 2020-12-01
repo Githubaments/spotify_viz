@@ -21,8 +21,12 @@ redirect_uri = 'https://spotyviz.herokuapp.com'
 
 
 conf = (client_id, client_secret, redirect_uri)
-token = tk.prompt_for_user_token(*conf, scope=tk.scope.every)
-
+user_token = tk.prompt_for_user_token(
+    client_id,
+    client_secret,
+    redirect_uri,
+    scope=tk.scope.every
+)
 
 
 def cache_on_button_press(label, **cache_kwargs):
