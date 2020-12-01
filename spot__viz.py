@@ -8,6 +8,7 @@ from spotipy.oauth2 import SpotifyOAuth
 import json
 import spotipy.util as util
 import os
+import tekore as tk
 
 
 st.set_page_config(page_title='Spotify Viz', page_icon="https://raw.githubusercontent.com/Githubaments/Images/main/favicon.ico")
@@ -15,8 +16,12 @@ st.set_page_config(page_title='Spotify Viz', page_icon="https://raw.githubuserco
 px.defaults.template = "simple_white"
 client_id = (os.environ.get('client_id'))
 client_secret = (os.environ.get('client_secret'))
-scope = 'playlist-modify-private,playlist-modify-public,playlist-modify-public,user-top-read,user-read-recently-played,user-library-read'
+#scope = 'playlist-modify-private,playlist-modify-public,playlist-modify-public,user-top-read,user-read-recently-played,user-library-read'
 redirect = 'https://spotyviz.herokuapp.com'
+
+
+conf = (client_id, client_secret, redirect_uri)
+token = tk.prompt_for_user_token(*conf, scope=tk.scope.every)
 
 
 
@@ -76,7 +81,7 @@ def spotify_50():
 
     display_name = json_response['display_name']
     usernamesp = json_response['id']
-    token = get_token(usernamesp)
+    #token = get_token(usernamesp)
     pic = json_response['images'][0]['url']
 
     st.write(f"Hi there {display_name}")
