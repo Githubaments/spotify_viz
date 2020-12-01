@@ -17,7 +17,7 @@ px.defaults.template = "simple_white"
 client_id = (os.environ.get('client_id'))
 client_secret = (os.environ.get('client_secret'))
 #scope = 'playlist-modify-private,playlist-modify-public,playlist-modify-public,user-top-read,user-read-recently-played,user-library-read'
-redirect = 'https://spotyviz.herokuapp.com'
+redirect_uri = 'https://spotyviz.herokuapp.com'
 
 
 conf = (client_id, client_secret, redirect_uri)
