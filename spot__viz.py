@@ -21,12 +21,13 @@ redirect_uri = 'https://spotyviz.herokuapp.com'
 
 
 conf = (client_id, client_secret, redirect_uri)
-user_token = tk.prompt_for_user_token(
-    client_id,
-    client_secret,
-    redirect_uri,
-    scope=tk.scope.every
-)
+scope = tk.scope.user_top_read + tk.scope.playlist_modify_private
+token = tk.prompt_for_user_token(*conf, scope=scope)
+
+spotify = tk.Spotify(token)
+top_tracks = spotify.current_user_top_tracks(limit=5).items
+
+st.write(top_tracks)
 
 
 def cache_on_button_press(label, **cache_kwargs):
